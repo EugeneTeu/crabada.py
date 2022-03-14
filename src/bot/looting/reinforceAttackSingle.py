@@ -36,9 +36,10 @@ def reinforceAttackSingle(looterAddress: Address, currentTeamId: int) -> int:
         # Find best reinforcement crab to borrow
         mineId = mine['game_id']
         maxPrice = user.config['maxPriceToReinforceInTus']
+
         strategyName = user.getTeamConfig(
-            mine['team_id']).get('reinforceStrategyName')
-        if currentTeamId == mine['team_id']:
+            mine['attack_team_id']).get('reinforceStrategyName')
+        if int(currentTeamId) == mine['attack_team_id']:
             try:
                 crab = getBestReinforcement(looterAddress, mine, maxPrice)
             except CrabBorrowPriceTooHigh:
