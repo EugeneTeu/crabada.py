@@ -9,7 +9,7 @@ class AvalancheCWeb3Client(Web3Client):
     its smart contracts.
     """
 
-    chainId: int = 73771
+    chainId: int = 43114
     gasLimit: int = 400000  # sensible value for Avalanche
     maxPriorityFeePerGasInGwei: int = 2  # TODO: fine tune
 
