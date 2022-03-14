@@ -16,8 +16,8 @@ class CrabadaWeb2Client:
     list for list endpoints, a dict for specific endpoints)
     """
 
-    # baseUri = 'https://idle-api.crabada.com/public/idle'
-    baseUri = 'https://idle-game-subnet-test-api.crabada.com/public/idle'
+    baseUri = 'https://idle-api.crabada.com/public/idle'
+    # baseUri = 'https://idle-game-subnet-test-api.crabada.com/public/idle'
 
     def getMine(self, mineId: int, params: dict[str, Any] = {}) -> Game:
         """Get information from the given mine"""
