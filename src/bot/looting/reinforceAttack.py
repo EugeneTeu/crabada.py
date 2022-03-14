@@ -22,10 +22,8 @@ def reinforceAttack(looterAddress: Address) -> int:
 
     TODO: implement paging
     """
-
     user = User(looterAddress)
     openLoots = crabadaWeb2Client.listMyOpenLoots(looterAddress)
-    print(openLoots)
     reinforceableMines = [m for m in openLoots if looterCanReinforce(m)]
     if not reinforceableMines:
         logger.info('No loots to reinforce for user ' + str(looterAddress))
@@ -37,7 +35,6 @@ def reinforceAttack(looterAddress: Address) -> int:
 
         # Find best reinforcement crab to borrow
         mineId = mine['game_id']
-        print(mine['attack_team_id'])
         maxPrice = user.config['maxPriceToReinforceInTus']
         strategyName = user.getTeamConfig(
             mine['attack_team_id']).get('reinforceStrategyName')
