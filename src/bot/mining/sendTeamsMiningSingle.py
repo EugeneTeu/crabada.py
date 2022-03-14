@@ -32,7 +32,7 @@ def sendTeamsMiningSingle(userAddress: Address, currentTeamId: int) -> int:
     nSentTeams = 0
     for t in availableTeams:
         teamId = t['team_id']
-        if int(teamId) == currentTeamId:
+        if int(teamId) == int(currentTeamId):
             logger.info(f'Sending team {teamId} to mine...')
 
             txHash = crabadaWeb3Client.startGame(teamId)
