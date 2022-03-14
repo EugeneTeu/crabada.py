@@ -8,6 +8,7 @@ __pycache__/
 *.so
 *~
 .env
+.env.swimmer
 .history
 reports/
 .DS_Store
@@ -17,3 +18,5 @@ Desktop.ini
 .tox
 .cache
 .vscode
+
+
