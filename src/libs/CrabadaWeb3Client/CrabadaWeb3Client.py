@@ -18,9 +18,10 @@ class CrabadaWeb3Client(AvalancheCWeb3Client):
     https://testnet-explorer.swimmer.network/address/0x801B5Bb19e9052dB964b94ed5b4d6730D8FcCA25/transactions
     """
 
-    # contractAddress = cast(Address, '0x82a85407bd612f52577909f4a58bfc6873f14da8')
     contractAddress = cast(
-        Address, "0x801b5bb19e9052db964b94ed5b4d6730d8fcca25")
+        Address, '0x82a85407bd612f52577909f4a58bfc6873f14da8')
+    # contractAddress = cast(
+    #     Address, "0x801b5bb19e9052db964b94ed5b4d6730d8fcca25")
     abiDir = os.path.dirname(os.path.realpath(__file__)) + '/abi'
     abi = Web3Client.getContractAbiFromFile(abiDir + '/abi-crabada.json')
 
