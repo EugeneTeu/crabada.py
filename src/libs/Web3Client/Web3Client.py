@@ -89,7 +89,7 @@ class Web3Client:
         Requires passing the contract function as detailed in the docs:
         https://web3py.readthedocs.io/en/stable/web3.eth.account.html#sign-a-contract-transaction
         """
-        baseTx = self.buildBaseTransactionNonEIP1559()
+        baseTx = self.buildBaseTransaction()
         return contractFunction.buildTransaction(baseTx)
 
     ####################
