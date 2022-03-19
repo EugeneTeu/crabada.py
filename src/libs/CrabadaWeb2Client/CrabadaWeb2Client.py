@@ -35,6 +35,7 @@ class CrabadaWeb2Client:
         If you want only the open mines, pass status=open in the params.
         If you want only a certain user's mines, use the user_address param.
         """
+
         res = self.listMines_Raw(params)
         try:
             return res['result']['data'] or []
@@ -57,7 +58,7 @@ class CrabadaWeb2Client:
         """
         params.pop('user_address', None)
         params['looter_address'] = looterAddress
-        params['status'] = 'open'
+        # params['status'] = 'open'
         return self.listMines(params)
 
     def listMines_Raw(self, params: dict[str, Any] = {}) -> Any:
