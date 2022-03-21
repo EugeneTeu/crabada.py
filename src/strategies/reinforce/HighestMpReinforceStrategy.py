@@ -1,7 +1,7 @@
 from typing import Any, List
 from src.libs.CrabadaWeb2Client.types import CrabForLending, Game
 from src.strategies.reinforce.ReinforceStrategy import ReinforceStrategy
-from src.helpers.general import firstOrNone
+from src.helpers.general import firstOrNone, secondOrNone, thirdOrNone, fourthOrNone
 from src.helpers.price import weiToTus
 
 
@@ -19,10 +19,14 @@ class HighestMpReinforceStrategy(ReinforceStrategy):
         }
 
     def crab(self, game: Game, list: List[CrabForLending]) -> CrabForLending:
-        affordableCrabs = [c for c in list if weiToTus(c["price"]) < self.maxPrice1]
+        affordableCrabs = [c for c in list if weiToTus(
+            c["price"]) < self.maxPrice1]
         if len(affordableCrabs) == 0:
             return None
         sortedAffordableCrabs = sorted(
             affordableCrabs, key=lambda c: (-c["mine_point"], c["price"])
         )
-        return firstOrNone(sortedAffordableCrabs)
+        return (fourthOrNone(sortedAffordableCrabs)
+                or thirdOrNone(sortedAffordableCrabs)
+                or secondOrNone(sortedAffordableCrabs)
+                or firstOrNone(sortedAffordableCrabs))
