@@ -51,24 +51,12 @@ class Web3Client:
         maxMaxFeePerGas = 2 * baseFee + maxPriorityFeePerGas.
         """
         tx: TxParams = {
-            'type': 0x2,
-            'chainId': self.chainId,
-            'gas': self.gasLimit,  # type: ignore
-            'maxFeePerGas': Web3.toWei(self.estimateMaxFeePerGasInGwei(), 'gwei'),
-            'maxPriorityFeePerGas': Web3.toWei(self.maxPriorityFeePerGasInGwei, 'gwei'),
-            'nonce': self.getNonce(),
-        }
-        return tx
-
-    def buildBaseTransactionNonEIP1559(self) -> TxParams:
-        tx: TxParams = {
-            'type': 0x1,
-            'chainId': self.chainId,
-            'gas': self.gasLimit,  # type: ignore
-            'gasPrice':  25000000000,
-            # 'baseFeePerGas': Web3.toWei(self.estimateMaxFeePerGasInGwei(), 'gwei'),
-            # 'maxPriorityFeePerGas': Web3.toWei(self.maxPriorityFeePerGasInGwei, 'gwei'),
-            'nonce': self.getNonce(),
+            "type": 0x2,
+            "chainId": self.chainId,
+            "gas": self.gasLimit,  # type: ignore
+            "maxFeePerGas": Web3.toWei(self.estimateMaxFeePerGasInGwei(), "gwei"),
+            "maxPriorityFeePerGas": Web3.toWei(self.maxPriorityFeePerGasInGwei, "gwei"),
+            "nonce": self.getNonce(),
         }
         return tx
 
@@ -79,7 +67,7 @@ class Web3Client:
         """
         tx = self.buildBaseTransaction()
         txValue: TxParams = {
-            'to': to, 'value': self.w3.toWei(valueInEth, 'ether')}
+            "to": to, "value": self.w3.toWei(valueInEth, "ether")}
         return tx | txValue
 
     def buildContractTransaction(self, contractFunction: ContractFunction) -> TxParams:
@@ -166,28 +154,30 @@ class Web3Client:
         web3 gas_price_strategy middleware (and also here >
         https://ethereum.stackexchange.com/a/113373/89782)
         """
-        latest_block = self.w3.eth.get_block('latest')
-        baseFeeInWei = latest_block['baseFeePerGas']  # in wei
-        baseFeeInGwei = int(Web3.fromWei(baseFeeInWei, 'gwei'))
+        latest_block = self.w3.eth.get_block("latest")
+        baseFeeInWei = latest_block["baseFeePerGas"]  # in wei
+        baseFeeInGwei = int(Web3.fromWei(baseFeeInWei, "gwei"))
         return 2 * baseFeeInGwei + self.maxPriorityFeePerGasInGwei
 
     def getLatestBlock(self) -> BlockData:
         """
         Return the latest block
         """
-        return self.w3.eth.get_block('latest')
+        return self.w3.eth.get_block("latest")
 
     def getPendingBlock(self) -> BlockData:
         """
         Return the pending block
         """
-        return self.w3.eth.get_block('pending')
+        return self.w3.eth.get_block("pending")
 
     ####################
     # Setters
     ####################
 
-    def setContract(self, address: Address, abiFile: str = None, abi: dict[str, Any] = None) -> Web3Client:
+    def setContract(
+        self, address: Address, abiFile: str = None, abi: dict[str, Any] = None
+    ) -> Web3Client:
         """
         Load the smart contract, required before running
         buildContractTransaction().
@@ -201,9 +191,10 @@ class Web3Client:
         elif abi:  # read the contract's ABI from a string
             self.abi = abi
         if not self.abi:
-            raise MissingParameter('Missing ABI')
+            raise MissingParameter("Missing ABI")
         self.contract = self.w3.eth.contract(
-            address=self.contractChecksumAddress, abi=self.abi)
+            address=self.contractChecksumAddress, abi=self.abi
+        )
         return self
 
     def setNodeUri(self, nodeUri: str = None) -> Web3Client:
@@ -232,7 +223,9 @@ class Web3Client:
         self.chainId = int(chainId)
         return self
 
-    def setMaxPriorityFeePerGasInGwei(self, maxPriorityFeePerGasInGwei: int) -> Web3Client:
+    def setMaxPriorityFeePerGasInGwei(
+        self, maxPriorityFeePerGasInGwei: int
+    ) -> Web3Client:
         self.maxPriorityFeePerGasInGwei = maxPriorityFeePerGasInGwei
         return self
 
@@ -250,9 +243,9 @@ class Web3Client:
             return json.load(file)
 
     def getProvider(self) -> Web3:
-        if (self.nodeUri[0:4] == 'http'):
+        if self.nodeUri[0:4] == "http":
             return Web3(Web3.HTTPProvider(self.nodeUri))
-        elif (self.nodeUri[0:2] == 'ws'):
+        elif self.nodeUri[0:2] == "ws":
             return Web3(Web3.WebsocketProvider(self.nodeUri))
         else:
             return Web3()

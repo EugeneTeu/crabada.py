@@ -16,16 +16,15 @@ class CrabadaWeb2Client:
     list for list endpoints, a dict for specific endpoints)
     """
 
-    baseUri = 'https://idle-api.crabada.com/public/idle'
-    # baseUri = 'https://idle-game-subnet-test-api.crabada.com/public/idle'
+    baseUri = "https://idle-api.crabada.com/public/idle"
 
     def getMine(self, mineId: int, params: dict[str, Any] = {}) -> Game:
         """Get information from the given mine"""
         res = self.getMine_Raw(mineId, params)
-        return res['result']
+        return res["result"]
 
     def getMine_Raw(self, mineId: int, params: dict[str, Any] = {}) -> Any:
-        url = self.baseUri + '/mine/' + str(mineId)
+        url = self.baseUri + "/mine/" + str(mineId)
         return requests.request("GET", url, params=params).json()
 
     def listMines(self, params: dict[str, Any] = {}) -> List[Game]:
@@ -38,31 +37,54 @@ class CrabadaWeb2Client:
 
         res = self.listMines_Raw(params)
         try:
-            return res['result']['data'] or []
+            return res["result"]["data"] or []
         except:
             return []
 
-    def listMyOpenMines(self, userAddress: Address, params: dict[str, Any] = {}) -> List[Game]:
+    def listOpenMines(self, params: dict[str, Any] = {}) -> List[Game]:
+        """
+        Get open mines
+        """
+        params["status"] = "open"
+        return self.listMines(params)
+
+    def listLootableMines(
+        self, looterAddress: Address, params: dict[str, Any] = {}
+    ) -> List[Game]:
+        """
+        Get mines that are lootable; it is required to provide a user
+        address.
+        """
+        params["can_loot"] = 1
+        params["looter_address"] = looterAddress
+        params["status"] = "open"
+        return self.listMines(params)
+
+    def listMyOpenMines(
+        self, userAddress: Address, params: dict[str, Any] = {}
+    ) -> List[Game]:
         """
         Get all mines that belong to the given user address
         and that are open
         """
-        params['user_address'] = userAddress
-        params['status'] = 'open'
+        params["user_address"] = userAddress
+        params["status"] = "open"
         return self.listMines(params)
 
-    def listMyOpenLoots(self, looterAddress: Address, params: dict[str, Any] = {}) -> List[Game]:
+    def listMyOpenLoots(
+        self, looterAddress: Address, params: dict[str, Any] = {}
+    ) -> List[Game]:
         """
         Get all mines that are being looted by the given looter address
         and that are open
         """
-        params.pop('user_address', None)
-        params['looter_address'] = looterAddress
-        # params['status'] = 'open'
+        params.pop("user_address", None)
+        params["looter_address"] = looterAddress
+        params["status"] = "open"
         return self.listMines(params)
 
     def listMines_Raw(self, params: dict[str, Any] = {}) -> Any:
-        url = self.baseUri + '/mines'
+        url = self.baseUri + "/mines"
         defaultParams = {
             "limit": 5,
             "page": 1,
@@ -73,7 +95,9 @@ class CrabadaWeb2Client:
     def getTeam(self) -> None:
         raise Exception("The team route does not exit on the server!")
 
-    def listTeams(self, userAddress: Address, params: dict[str, Any] = {}) -> List[Team]:
+    def listTeams(
+        self, userAddress: Address, params: dict[str, Any] = {}
+    ) -> List[Team]:
         """
         Get all teams of a given user address.
 
@@ -84,25 +108,27 @@ class CrabadaWeb2Client:
         """
         res = self.listTeams_Raw(userAddress, params)
         try:
-            return res['result']['data'] or []
+            return res["result"]["data"] or []
         except:
             return []
 
-    def listAvailableTeams(self, userAddress: Address, params: dict[str, Any] = {}) -> List[Team]:
+    def listAvailableTeams(
+        self, userAddress: Address, params: dict[str, Any] = {}
+    ) -> List[Team]:
         """
         Get all available teams of a given user address.
         """
-        actualParams = params | {'is_team_available': 1}
+        actualParams = params | {"is_team_available": 1}
         return self.listTeams(userAddress, actualParams)
 
     def listTeams_Raw(self, userAddress: Address, params: dict[str, Any] = {}) -> Any:
-        url = self.baseUri + '/teams'
+        url = self.baseUri + "/teams"
         defaultParams = {
             "limit": 5,
             "page": 1,
         }
         actualParams = defaultParams | params
-        actualParams['user_address'] = userAddress
+        actualParams["user_address"] = userAddress
         return requests.request("GET", url, params=actualParams).json()
 
     def listCrabsForLending(self, params: dict[str, Any] = {}) -> List[CrabForLending]:
@@ -117,7 +143,7 @@ class CrabadaWeb2Client:
         """
         res = self.listCrabsForLending_Raw(params)
         try:
-            return res['result']['data'] or []
+            return res["result"]["data"] or []
         except:
             return []
 
@@ -127,27 +153,29 @@ class CrabadaWeb2Client:
         or None if no crab is found
         """
         params["limit"] = 1
-        params["orderBy"] = 'price'
-        params["order"] = 'asc'
+        params["orderBy"] = "price"
+        params["order"] = "asc"
         return firstOrNone(self.listCrabsForLending(params))
 
-    def getSecondCheapestCrabForLending(self, params: dict[str, Any] = {}) -> CrabForLending:
+    def getSecondCheapestCrabForLending(
+        self, params: dict[str, Any] = {}
+    ) -> CrabForLending:
         """
         Return the second cheapest crab on the market available for lending,
         or None if no crab is found
         """
         params["limit"] = 2
-        params["orderBy"] = 'price'
-        params["order"] = 'asc'
+        params["orderBy"] = "price"
+        params["order"] = "asc"
         return secondOrNone(self.listCrabsForLending(params))
 
     def listCrabsForLending_Raw(self, params: dict[str, Any] = {}) -> Any:
-        url = self.baseUri + '/crabadas/lending'
+        url = self.baseUri + "/crabadas/lending"
         defaultParams = {
             "limit": 10,
             "page": 1,
-            "orderBy": 'price',
-            "order": 'asc',
+            "orderBy": "price",
+            "order": "asc",
         }
         actualParams = defaultParams | params
         # type: ignore

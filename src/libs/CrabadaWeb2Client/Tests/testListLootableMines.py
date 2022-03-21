@@ -7,9 +7,13 @@ client = CrabadaWeb2Client()
 looterAddress = users[0]["address"]
 
 # TEST FUNCTIONS
-def testListMyOpenLoots() -> None:
-    pprint(client.listMyOpenLoots(looterAddress))
+def testListLootableMines() -> None:
+    params = {
+        "limit": 3,
+        "page": 1,
+    }
+    pprint(client.listLootableMines(looterAddress, params=params))
 
 
 # EXECUTE
-testListMyOpenLoots()
+testListLootableMines()
