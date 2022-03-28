@@ -30,4 +30,4 @@ if not User.isRegistered(userAddress):
     logger.error('The given user address is not registered')
     exit(1)
 
-nReinforced = reinforceAttackSingle(userAddress, teamId)
+nReinforced = reinforceAttackSingle(User(userAddress), teamId)
