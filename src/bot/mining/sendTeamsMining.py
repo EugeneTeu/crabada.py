@@ -5,25 +5,22 @@ Send a user's available teams mining
 from src.common.logger import logger
 from src.common.txLogger import txLogger, logTx
 from src.helpers.sms import sendSms
-from src.common.clients import crabadaWeb2Client, crabadaWeb3Client
-from eth_typing import Address
+from src.common.clients import crabadaWeb3Client
+from src.helpers.teams import fetchAvailableTeamsForTask
+from src.models.User import User
 
 
-def sendTeamsMining(userAddress: Address) -> int:
+def sendTeamsMining(user: User) -> int:
     """
-    Send all available teams of crabs to mine.
+    Send mining the available teams with the 'mine' task.
 
-    A game/mine will be started for each available team; returns the number
-    of games opened.
-
-    TODO: implement paging
+    Returns the opened mines
     """
-    availableTeams = crabadaWeb2Client.listTeams(
-        userAddress, {"is_team_available": 1, "limit": 200, "page": 1}
-    )
+
+    availableTeams = fetchAvailableTeamsForTask(user, "mine")
 
     if not availableTeams:
-        logger.info("No available teams to send mining for user " + str(userAddress))
+        logger.info("No available teams to send mining for user " + str(user.address))
         return 0
 
     # Send the teams

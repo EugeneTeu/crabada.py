@@ -3,33 +3,33 @@ Helper functions to reinforce all mines of a given user
 """
 
 from web3.main import Web3
-from src.common.exceptions import CrabBorrowPriceTooHigh
+from src.common.exceptions import (
+    ReinforcementTooExpensive,
+    NoSuitableReinforcementFound,
+)
 from src.common.logger import logger
 from src.common.txLogger import txLogger, logTx
+from src.helpers.mines import fetchOpenMines
 from src.helpers.reinforce import minerCanReinforce
 from src.helpers.sms import sendSms
-from src.common.clients import crabadaWeb2Client, crabadaWeb3Client
-from eth_typing import Address
+from src.common.clients import crabadaWeb3Client
 from src.models.User import User
-from src.strategies.StrategyFactory import getBestReinforcement
+from src.strategies.reinforce.ReinforceStrategyFactory import getBestReinforcement
 from time import sleep
 from src.common.config import reinforceDelayInSeconds
 
 
-def reinforceDefense(userAddress: Address) -> int:
+def reinforceDefense(user: User) -> int:
     """
     Check if any of the teams of the user that are mining can be
     reinforced, and do so if this is the case; return the
     number of borrowed reinforcements.
-
-    TODO: implement paging
     """
 
-    user = User(userAddress)
-    openMines = crabadaWeb2Client.listMyOpenMines(userAddress)
-    reinforceableMines = [m for m in openMines if minerCanReinforce(m)]
+    reinforceableMines = [m for m in fetchOpenMines(user) if minerCanReinforce(m)]
+
     if not reinforceableMines:
-        logger.info("No mines to reinforce for user " + str(userAddress))
+        logger.info("No mines to reinforce for user " + str(user.address))
         return 0
 
     # Reinforce the mines
@@ -38,19 +38,16 @@ def reinforceDefense(userAddress: Address) -> int:
 
         # Find best reinforcement crab to borrow
         mineId = mine["game_id"]
-        maxPrice = user.config["maxPriceToReinforceInTus"]
+        maxPrice = user.config["reinforcementMaxPriceInTus"]
         strategyName = user.getTeamConfig(mine["team_id"]).get("reinforceStrategyName")
         try:
-            crab = getBestReinforcement(userAddress, mine, maxPrice)
-        except CrabBorrowPriceTooHigh:
-            logger.warning(
-                f"Price of crab is {Web3.fromWei(crab['price'], 'ether')} TUS which exceeds the user limit of {maxPrice} [strategyName={strategyName}]"
-            )
+            crab = getBestReinforcement(user, mine, maxPrice)
+        except (ReinforcementTooExpensive, NoSuitableReinforcementFound) as e:
+            logger.warning(e.__class__.__name__ + ": " + str(e))
             continue
+
+        # Some strategies might return no reinforcement
         if not crab:
-            logger.warning(
-                f"Could not find a crab to lend for mine {mineId} [strategyName={strategyName}]"
-            )
             continue
 
         crabId = crab["crabada_id"]

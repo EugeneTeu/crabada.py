@@ -6,34 +6,28 @@ of a given user
 from src.common.logger import logger
 from src.common.txLogger import txLogger, logTx
 from src.helpers.sms import sendSms
-from src.common.clients import crabadaWeb2Client, crabadaWeb3Client
-from eth_typing import Address
+from src.common.clients import crabadaWeb3Client
 from src.helpers.mines import (
+    fetchOpenMines,
     getNextMineToFinish,
     getRemainingTimeFormatted,
     mineIsFinished,
 )
-from src.libs.CrabadaWeb2Client.types import Game
+from src.models.User import User
 
 
-def closeMines(userAddress: Address) -> int:
+def closeMines(user: User) -> int:
     """
     Close all open mining games whose end time is due; return
     the number of closed games.
-
-    TODO: implement paging
     """
 
-    openGames = crabadaWeb2Client.listMines(
-        {"limit": 200, "status": "open", "user_address": userAddress}
-    )
-
-    # Games with a reward to claim
+    openGames = fetchOpenMines(user)
     finishedGames = [g for g in openGames if mineIsFinished(g)]
 
     # Print a useful message in case there aren't finished games
     if not finishedGames:
-        message = f"No mines to close for user {str(userAddress)}"
+        message = f"No mines to close for user {str(user.address)}"
         nextGameToFinish = getNextMineToFinish(openGames)
         if nextGameToFinish:
             message += f" (next in {getRemainingTimeFormatted(nextGameToFinish)})"
