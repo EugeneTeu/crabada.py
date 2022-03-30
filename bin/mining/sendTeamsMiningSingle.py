@@ -30,4 +30,4 @@ if not User.isRegistered(userAddress):
     logger.error('The given user address is not registered')
     exit(1)
 
-nSent = sendTeamsMiningSingle(userAddress, teamId)
+nSent = sendTeamsMiningSingle(User(userAddress), teamId)
