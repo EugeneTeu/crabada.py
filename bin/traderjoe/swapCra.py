@@ -17,7 +17,6 @@ from src.common.logger import logger
 from src.swap import (
     CRA_TO_AVAX_PATH,
     getCraBalance,
-    swapTokenToAvaxTraderJoe,
     swapTokenToAvaxTraderJoeVariableBalance,
 )
 

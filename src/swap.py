@@ -40,7 +40,7 @@ def makePangolinClient(user: User) -> RouterWeb3Client:
 
 
 def makeTraderJoeClient(user: User) -> RouterWeb3Client:
-    traderJoeRouterContract = "0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106"
+    traderJoeRouterContract = "0x60aE616a2155Ee3d9A68541Ba4544862310933d4"
     return RouterWeb3Client(
         nodeUri=nodeUri,
         privateKey=users[0]["privateKey"],
