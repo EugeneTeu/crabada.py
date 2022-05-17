@@ -8,6 +8,7 @@ Usage:
 """
 from typing import cast
 from web3 import Web3
+from decimal import Decimal
 
 from src.helpers.general import secondOrNone, thirdOrNone
 from src.common.config import nodeUri, users
@@ -21,7 +22,7 @@ from src.swap import (
 )
 
 userAddress = users[0]["address"]
-readableTusBalance = Web3.fromWei(getTusBalance(userAddress), "ether")
+readableTusBalance = cast(Decimal, Web3.fromWei(getTusBalance(userAddress), "ether"))
 swapTokenToAvaxTraderJoeVariableBalance(
     User(userAddress), readableTusBalance, TUS_TO_AVAX_PATH
 )

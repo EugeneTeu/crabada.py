@@ -1,9 +1,10 @@
 from decimal import Decimal
 from eth_typing import Address, ChecksumAddress
 from numpy import number
-import web3
-from src.common.clients import makeCraClient, makeTusClient
-from src.common.txLogger import logTx
+from web3 import Web3
+from web3.types import Wei
+from src.common.clients import makeAvalancheCraClient, makeAvalancheTusClient
+from src.common.logger import logTx, logger
 from src.libs.RouterWeb3Client.PangolinRouterWeb3Client import (
     PangolinRouterWeb3Client,
 )
@@ -16,7 +17,6 @@ from src.models.User import User
 from src.common.config import nodeUri, users
 from src.common.constants import tokens
 from web3 import Web3
-from src.common.txLogger import txLogger
 
 TUS_TO_AVAX_PATH = [
     Web3.toChecksumAddress("0xf693248f96fe03422fea95ac0afbbbc4a8fdd172"),
@@ -50,17 +50,17 @@ def makeTraderJoeClient(user: User) -> RouterWeb3Client:
 
 
 def getTusBalance(address: Address) -> int:
-    tusClient = makeTusClient()
+    tusClient = makeAvalancheTusClient()
     return tusClient.balanceOf(address)
 
 
 def getCraBalance(address: Address) -> int:
-    craClient = makeCraClient()
+    craClient = makeAvalancheCraClient()
     return craClient.balanceOf(address)
 
 
 def swapTokenToAvaxPangolin(
-    user: User, amtIn: float, path: list[ChecksumAddress]
+    user: User, amtIn: Wei, path: list[ChecksumAddress]
 ) -> None:
     """
     amtIn here is in wei
@@ -70,11 +70,11 @@ def swapTokenToAvaxPangolin(
     amtOut = amtsOut[len(amtsOut) - 1]
     # account for slippage
     amtOutMin = int(amtOut / 100 * 99.5)
-    askForUserInput(amtIn, amtOutMin, path)
+    askForUserInput(amtIn, amtOutMin, path, client)
 
 
 def swapTokenToAvaxTraderJoe(
-    user: User, amtIn: float, path: list[ChecksumAddress]
+    user: User, amtIn: Wei, path: list[ChecksumAddress]
 ) -> None:
     """
     amtIn here is in wei
@@ -97,7 +97,7 @@ def swapTokenToAvaxTraderJoeVariableBalance(
     while True:
         ans = Decimal(input(f"Currently you have {balance}. Input amount to swap: "))
         if ans > balance or ans <= 0:
-            txLogger.error("Amount given not a possible swap amount")
+            logger.error("Amount given not a possible swap amount")
             break
         else:
             swapTokenToAvaxTraderJoe(user, Web3.toWei(ans, "ether"), path)
@@ -105,8 +105,8 @@ def swapTokenToAvaxTraderJoeVariableBalance(
 
 
 def askForUserInput(
-    amtIn: float,
-    amtOutMin: float,
+    amtIn: Wei,
+    amtOutMin: int,
     path: list[ChecksumAddress],
     client: RouterWeb3Client,
 ) -> None:
@@ -119,7 +119,7 @@ def askForUserInput(
         if ans == "Y" or ans == "y":
             swapTokenForAvax(amtIn, amtOutMin, path, client)
         else:
-            txLogger.info("user rejected txn")
+            logger.info("user rejected txn")
         break
 
 
@@ -130,6 +130,6 @@ def swapTokenForAvax(
     client: RouterWeb3Client,
 ) -> None:
     txHash = client.swapExactTokensForAvax(amtIn, amtOutMin, path)
-    txLogger.info(txHash)
+    logger.info(txHash)
     txReceipt = client.getTransactionReceipt(txHash)
     logTx(txReceipt)

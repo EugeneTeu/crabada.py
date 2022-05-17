@@ -6,6 +6,7 @@ Usage:
     python3 -m bin.traderjoe.swapCra
 
 """
+from decimal import Decimal
 from typing import cast
 from web3 import Web3
 
@@ -21,7 +22,7 @@ from src.swap import (
 )
 
 userAddress = users[0]["address"]
-readableCraBalance = Web3.fromWei(getCraBalance(userAddress), "ether")
+readableCraBalance = cast(Decimal, Web3.fromWei(getCraBalance(userAddress), "ether"))
 swapTokenToAvaxTraderJoeVariableBalance(
     User(userAddress), readableCraBalance, CRA_TO_AVAX_PATH
 )
