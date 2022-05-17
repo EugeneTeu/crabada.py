@@ -8,7 +8,8 @@ from src.libs.CrabadaWeb3Client.CrabadaWeb3Client import CrabadaWeb3Client
 from src.libs.CrabadaWeb2Client.CrabadaWeb2Client import CrabadaWeb2Client
 from src.libs.Web3Client.Erc20Web3Client import Erc20Web3Client
 from src.libs.Web3Client.Web3Client import Web3Client
-from src.libs.Web3Client.Web3ClientFactory import makeErc20Client, makeWeb3Client
+from src.libs.Web3Client.Web3ClientFactory import makeErc20Client, makeWeb3Client, makeWrappedErc20Client
+from src.libs.Web3Client.WrappedErc20Web3Client import WrappedErc20Web3Client
 
 
 def makeCrabadaWeb2Client() -> CrabadaWeb2Client:
@@ -84,7 +85,7 @@ def makeAvalancheCraClient() -> Erc20Web3Client:
     )
 
 
-def makeSwimmerWtusClient() -> Erc20Web3Client:
+def makeSwimmerWtusClient() -> WrappedErc20Web3Client:
     """
     Return an initialized client to interact with the WTUS
     token contract on the Swimmer Network Avalanche subnet.
@@ -94,7 +95,7 @@ def makeSwimmerWtusClient() -> Erc20Web3Client:
     method in Web3Client.
     """
     wtusContract = cast(Address, "0x9c765eEE6Eff9CF1337A1846c0D93370785F6C92")
-    return makeErc20Client(
+    return makeWrappedErc20Client(
         "SwimmerNetwork",
         nodeUri,
         wtusContract,
